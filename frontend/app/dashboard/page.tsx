@@ -4,9 +4,8 @@ import { useAuthStore } from "@/stores/auth-store";
 import { usePosts } from "@/hooks/use-posts";
 import { useDrafts } from "@/hooks/use-drafts";
 import { useCurrentStrategy } from "@/hooks/use-strategy";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, PenTool, Target, BarChart3, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardPage() {
@@ -19,129 +18,93 @@ export default function DashboardPage() {
 	const draftCount = draftsData?.pagination?.total ?? 0;
 	const hasStrategy = !!strategyData?.data;
 
-	const stats = [
-		{ title: "Imported Posts", value: postCount, icon: FileText, href: "/dashboard/posts" },
-		{
-			title: "Generated Drafts",
-			value: draftCount,
-			icon: PenTool,
-			href: "/dashboard/drafts",
-		},
-		{
-			title: "Active Strategy",
-			value: hasStrategy ? "Yes" : "None",
-			icon: Target,
-			href: "/dashboard/strategy",
-		},
-		{ title: "Analytics", value: "View", icon: BarChart3, href: "/dashboard/analytics" },
-	];
-
 	return (
-		<div className="space-y-8">
+		<div className="mx-auto max-w-2xl space-y-10">
+			{/* Greeting */}
 			<div>
-				<h1 className="text-3xl font-bold">
-					Welcome back, {user?.name?.split(" ")[0] ?? "there"}!
+				<h1 className="text-lg font-semibold">
+					Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
 				</h1>
-				<p className="mt-1 text-muted-foreground">
-					Here&apos;s an overview of your content workspace.
+				<p className="mt-1 text-sm text-muted-foreground">
+					Your content workspace overview.
 				</p>
 			</div>
 
-			{/* Stats Grid */}
-			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-				{stats.map((stat) => (
-					<Link key={stat.title} href={stat.href}>
-						<Card className="transition-shadow hover:shadow-md">
-							<CardHeader className="flex flex-row items-center justify-between pb-2">
-								<CardTitle className="text-sm font-medium text-muted-foreground">
-									{stat.title}
-								</CardTitle>
-								<stat.icon className="h-5 w-5 text-muted-foreground" />
-							</CardHeader>
-							<CardContent>
-								<div className="text-2xl font-bold">{stat.value}</div>
-							</CardContent>
-						</Card>
-					</Link>
-				))}
+			{/* Metrics */}
+			<div className="grid grid-cols-3 gap-px overflow-hidden rounded-lg border bg-border">
+				<Link
+					href="/dashboard/posts"
+					className="bg-card p-5 transition-colors hover:bg-secondary/40">
+					<p className="text-2xl font-semibold tabular-nums">{postCount}</p>
+					<p className="mt-1 text-xs text-muted-foreground">Posts</p>
+				</Link>
+				<Link
+					href="/dashboard/drafts"
+					className="bg-card p-5 transition-colors hover:bg-secondary/40">
+					<p className="text-2xl font-semibold tabular-nums">{draftCount}</p>
+					<p className="mt-1 text-xs text-muted-foreground">Drafts</p>
+				</Link>
+				<Link
+					href="/dashboard/strategy"
+					className="bg-card p-5 transition-colors hover:bg-secondary/40">
+					<p className="text-2xl font-semibold">{hasStrategy ? "Active" : "None"}</p>
+					<p className="mt-1 text-xs text-muted-foreground">Strategy</p>
+				</Link>
 			</div>
 
-			{/* Quick Actions */}
-			<Card>
-				<CardHeader>
-					<CardTitle>Quick Actions</CardTitle>
-				</CardHeader>
-				<CardContent className="grid gap-4 sm:grid-cols-3">
-					{postCount === 0 ? (
-						<Link href="/dashboard/posts">
-							<Button variant="outline" className="w-full justify-between">
-								Import LinkedIn Posts <ArrowRight className="h-4 w-4" />
-							</Button>
-						</Link>
-					) : !hasStrategy ? (
-						<Link href="/dashboard/strategy">
-							<Button variant="outline" className="w-full justify-between">
-								Generate Strategy <ArrowRight className="h-4 w-4" />
-							</Button>
-						</Link>
-					) : (
-						<Link href="/dashboard/drafts">
-							<Button variant="outline" className="w-full justify-between">
-								Generate New Content <ArrowRight className="h-4 w-4" />
-							</Button>
-						</Link>
-					)}
-					<Link href="/dashboard/settings">
-						<Button variant="outline" className="w-full justify-between">
-							Configure AI Keys <ArrowRight className="h-4 w-4" />
-						</Button>
+			{/* Quick actions */}
+			<div className="space-y-1">
+				<p className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+					Quick actions
+				</p>
+				{postCount === 0 ? (
+					<Link
+						href="/dashboard/posts"
+						className="flex items-center justify-between rounded-md border px-4 py-3 text-sm transition-colors hover:bg-secondary/40">
+						Import LinkedIn Posts
+						<ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
 					</Link>
-					<Link href="/dashboard/analytics">
-						<Button variant="outline" className="w-full justify-between">
-							View Analytics <ArrowRight className="h-4 w-4" />
-						</Button>
+				) : !hasStrategy ? (
+					<Link
+						href="/dashboard/strategy"
+						className="flex items-center justify-between rounded-md border px-4 py-3 text-sm transition-colors hover:bg-secondary/40">
+						Generate Strategy
+						<ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
 					</Link>
-				</CardContent>
-			</Card>
+				) : (
+					<Link
+						href="/dashboard/drafts"
+						className="flex items-center justify-between rounded-md border px-4 py-3 text-sm transition-colors hover:bg-secondary/40">
+						Generate New Content
+						<ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+					</Link>
+				)}
+				<Link
+					href="/dashboard/settings"
+					className="flex items-center justify-between rounded-md border px-4 py-3 text-sm transition-colors hover:bg-secondary/40">
+					Configure AI Keys
+					<ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+				</Link>
+				<Link
+					href="/dashboard/analytics"
+					className="flex items-center justify-between rounded-md border px-4 py-3 text-sm transition-colors hover:bg-secondary/40">
+					View Analytics
+					<ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+				</Link>
+			</div>
 
-			{/* Getting Started Guide */}
+			{/* Getting started */}
 			{postCount === 0 && (
-				<Card>
-					<CardHeader>
-						<CardTitle>Getting Started</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<ol className="ml-4 list-decimal space-y-3 text-sm text-muted-foreground">
-							<li className="pl-2">
-								<strong className="text-foreground">
-									Configure AI Provider
-								</strong>{" "}
-								— Add your OpenAI, Anthropic, or Ollama API key in Settings.
-							</li>
-							<li className="pl-2">
-								<strong className="text-foreground">
-									Import LinkedIn Posts
-								</strong>{" "}
-								— Upload a CSV or JSON export of your LinkedIn activity.
-							</li>
-							<li className="pl-2">
-								<strong className="text-foreground">Run Analysis</strong> —
-								Let AI analyze your writing style and top-performing topics.
-							</li>
-							<li className="pl-2">
-								<strong className="text-foreground">
-									Generate Strategy
-								</strong>{" "}
-								— Get a personalized content calendar based on your data.
-							</li>
-							<li className="pl-2">
-								<strong className="text-foreground">Create Content</strong>{" "}
-								— Generate LinkedIn posts in your unique voice with
-								iterative refinement.
-							</li>
-						</ol>
-					</CardContent>
-				</Card>
+				<div className="rounded-lg border p-5">
+					<p className="text-sm font-medium mb-3">Getting started</p>
+					<ol className="list-decimal pl-4 space-y-2 text-sm text-muted-foreground">
+						<li>Configure your AI provider in Settings</li>
+						<li>Import your LinkedIn posts (CSV or JSON)</li>
+						<li>Run style analysis and topic extraction</li>
+						<li>Generate a content strategy</li>
+						<li>Create posts in your voice</li>
+					</ol>
+				</div>
 			)}
 		</div>
 	);

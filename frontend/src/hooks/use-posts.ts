@@ -17,7 +17,7 @@ export function usePosts(params: PostsParams = {}) {
     queryFn: async () => {
       const searchParams = new URLSearchParams();
       searchParams.set('page', String(page));
-      searchParams.set('limit', String(limit));
+      searchParams.set('pageSize', String(limit));
       if (search) searchParams.set('search', search);
       if (sortBy) searchParams.set('sortBy', sortBy);
       if (sortOrder) searchParams.set('sortOrder', sortOrder);
@@ -34,9 +34,7 @@ export function useUploadPosts() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append('file', file);
-      const { data } = await apiClient.post('/linkedin/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const { data } = await apiClient.post('/linkedin/upload', formData);
       return data;
     },
     onSuccess: () => {

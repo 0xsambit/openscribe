@@ -151,12 +151,22 @@ Save as `sample-posts.csv`:
 
 ```csv
 postText,likesCount,commentsCount,sharesCount,postedAt
-"Just shipped a feature today. Here are 3 lessons I learned from the launch...",42,8,3,2025-12-01
-"5 mistakes I made as a new engineering manager and what changed after that.",128,24,15,2025-11-15
-"Hot take: Most best practices are context-dependent. Ask why before applying them.",89,31,7,2025-10-20
-"Your career compounds when you optimize for learning velocity, not just compensation.",156,45,22,2025-09-10
-"The strongest engineers explain complex systems in simple language.",203,52,38,2025-08-05
+"Just shipped a major feature at work. Here's what I learned about shipping fast without breaking things: 1) Start with the smallest possible scope 2) Ship to 5% of users first 3) Monitor like crazy for 24 hours 4) Iterate based on real feedback. The biggest lesson? Perfect is the enemy of shipped.",142,28,12,2024-12-01
+"5 lessons from my first year as an engineering manager: 1) Your job is to multiply the output of others not do the work yourself 2) 1-on-1s are sacred - never cancel them 3) Feedback should be frequent and specific 4) Celebrate wins publicly address issues privately 5) Your team's growth is your success metric. What would you add?",328,64,45,2024-11-15
+"Hot take: Most best practices are just popular practices. What actually matters is understanding the WHY behind each decision. Context always beats dogma.",189,52,18,2024-10-20
+"The biggest career mistake I see engineers make: optimizing for compensation instead of learning velocity. In your 20s and early 30s compound learning beats compound interest.",256,71,34,2024-09-10
+"I interviewed 50+ senior engineers last year. The #1 trait that separated the great ones? They could explain complex things simply. Technical depth is table stakes. Communication is the force multiplier.",403,98,67,2024-08-05
 ```
+
+> **Note**: Column names are flexible. The parser recognizes variations like `Post`, `post_text`, `Content`, `Date`, `Posted`, etc.
+
+To use:
+
+1. Save the above content to `sample-posts.csv`
+2. Go to Dashboard → Posts
+3. Click the large **"Click to upload CSV or JSON"** box
+4. Select your CSV file
+5. Wait for import confirmation
 
 ---
 

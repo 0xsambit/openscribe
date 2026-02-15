@@ -21,8 +21,8 @@ export interface EngagementStats {
   avgEngagementScore: number;
   topPerformingIds: string[];
   bottomPerformingIds: string[];
-  trend: { date: string; engagement: number }[];
-  dayOfWeekPerformance: { day: number; avgEngagement: number }[];
+  weeklyTrends: { week: string; avgScore: number; postCount: number }[];
+  dayOfWeekAnalysis: { day: string; avgScore: number; postCount: number }[];
 }
 
 /**
@@ -46,8 +46,8 @@ export function analyzeEngagement(posts: PostData[]): EngagementStats {
       avgEngagementScore: 0,
       topPerformingIds: [],
       bottomPerformingIds: [],
-      trend: [],
-      dayOfWeekPerformance: [],
+      weeklyTrends: [],
+      dayOfWeekAnalysis: [],
     };
   }
 
@@ -69,10 +69,10 @@ export function analyzeEngagement(posts: PostData[]): EngagementStats {
   const topN = Math.max(1, Math.ceil(n * 0.1)); // Top 10%
 
   // Generate weekly trend
-  const trend = generateWeeklyTrend(scored);
+  const weeklyTrends = generateWeeklyTrend(scored);
 
   // Day of week performance
-  const dayOfWeekPerformance = analyzeDayOfWeek(scored);
+  const dayOfWeekAnalysis = analyzeDayOfWeek(scored);
 
   return {
     totalPosts: n,
@@ -82,12 +82,12 @@ export function analyzeEngagement(posts: PostData[]): EngagementStats {
     avgEngagementScore: avgScore,
     topPerformingIds: scored.slice(0, topN).map((p) => p.id),
     bottomPerformingIds: scored.slice(-topN).map((p) => p.id),
-    trend,
-    dayOfWeekPerformance,
+    weeklyTrends,
+    dayOfWeekAnalysis,
   };
 }
 
-function generateWeeklyTrend(posts: (PostData & { score: number })[]): { date: string; engagement: number }[] {
+function generateWeeklyTrend(posts: (PostData & { score: number })[]): { week: string; avgScore: number; postCount: number }[] {
   if (posts.length === 0) return [];
 
   // Group by week
@@ -104,14 +104,17 @@ function generateWeeklyTrend(posts: (PostData & { score: number })[]): { date: s
   }
 
   return Array.from(weekMap.entries())
-    .map(([date, scores]) => ({
-      date,
-      engagement: scores.reduce((a, b) => a + b, 0) / scores.length,
+    .map(([week, scores]) => ({
+      week,
+      avgScore: scores.reduce((a, b) => a + b, 0) / scores.length,
+      postCount: scores.length,
     }))
-    .sort((a, b) => a.date.localeCompare(b.date));
+    .sort((a, b) => a.week.localeCompare(b.week));
 }
 
-function analyzeDayOfWeek(posts: (PostData & { score: number })[]): { day: number; avgEngagement: number }[] {
+const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function analyzeDayOfWeek(posts: (PostData & { score: number })[]): { day: string; avgScore: number; postCount: number }[] {
   const dayScores = new Map<number, number[]>();
 
   for (const post of posts) {
@@ -122,16 +125,17 @@ function analyzeDayOfWeek(posts: (PostData & { score: number })[]): { day: numbe
 
   return Array.from(dayScores.entries())
     .map(([day, scores]) => ({
-      day,
-      avgEngagement: scores.reduce((a, b) => a + b, 0) / scores.length,
+      day: DAY_NAMES[day],
+      avgScore: scores.reduce((a, b) => a + b, 0) / scores.length,
+      postCount: scores.length,
     }))
-    .sort((a, b) => a.day - b.day);
+    .sort((a, b) => DAY_NAMES.indexOf(a.day) - DAY_NAMES.indexOf(b.day));
 }
 
 /**
  * Analyze topic performance.
  */
-export function analyzeTopicPerformance(posts: PostData[]): { topic: string; postCount: number; avgEngagement: number }[] {
+export function analyzeTopicPerformance(posts: PostData[]): { name: string; postCount: number; avgEngagement: number }[] {
   const topicMap = new Map<string, number[]>();
 
   for (const post of posts) {
@@ -143,8 +147,8 @@ export function analyzeTopicPerformance(posts: PostData[]): { topic: string; pos
   }
 
   return Array.from(topicMap.entries())
-    .map(([topic, scores]) => ({
-      topic,
+    .map(([name, scores]) => ({
+      name,
       postCount: scores.length,
       avgEngagement: scores.reduce((a, b) => a + b, 0) / scores.length,
     }))

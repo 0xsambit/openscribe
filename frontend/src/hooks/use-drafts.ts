@@ -15,7 +15,7 @@ export function useDrafts(params: DraftsParams = {}) {
     queryFn: async () => {
       const searchParams = new URLSearchParams();
       searchParams.set('page', String(page));
-      searchParams.set('limit', String(limit));
+      searchParams.set('pageSize', String(limit));
       if (status) searchParams.set('status', status);
       const { data } = await apiClient.get(`/content/drafts?${searchParams}`);
       return data;
@@ -38,7 +38,13 @@ export function useGenerateContent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (params: { topic?: string; tone?: string; strategyId?: string }) => {
+    mutationFn: async (params: {
+      topic: string;
+      strategyId?: string;
+      postType?: 'educational' | 'storytelling' | 'opinion' | 'case_study' | 'how_to' | 'list';
+      additionalGuidance?: string;
+      count?: number;
+    }) => {
       const { data } = await apiClient.post('/content/generate', params);
       return data;
     },
@@ -53,8 +59,8 @@ export function useUpdateDraft() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, content }: { id: string; content: string }) => {
-      const { data } = await apiClient.put(`/content/drafts/${id}`, { content });
+    mutationFn: async ({ id, postText, status }: { id: string; postText?: string; status?: 'draft' | 'approved' | 'rejected' | 'published' }) => {
+      const { data } = await apiClient.put(`/content/drafts/${id}`, { ...(postText !== undefined && { postText }), ...(status !== undefined && { status }) });
       return data;
     },
     onSuccess: (_, variables) => {

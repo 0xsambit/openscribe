@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import apiClient from '@/lib/api-client';
-import { setTokens, clearTokens, getAccessToken } from '@/lib/auth';
+import { setTokens, clearTokens, getAccessToken, getRefreshToken } from '@/lib/auth';
 
 interface User {
   id: string;
@@ -46,7 +46,10 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async () => {
     try {
-      await apiClient.post('/auth/logout');
+      const refreshToken = getRefreshToken();
+      if (refreshToken) {
+        await apiClient.post('/auth/logout', { refreshToken });
+      }
     } catch {
       // Ignore errors on logout
     }
@@ -75,7 +78,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   updatePreferences: async (preferences) => {
-    const { data } = await apiClient.put('/users/me/preferences', { preferences });
+    const { data } = await apiClient.put('/users/me/preferences', preferences);
     set({ user: data.data });
   },
 

@@ -26,17 +26,26 @@ export function useGenerateStrategy() {
 
   return useMutation({
     mutationFn: async (params: {
-      strategyType: string;
+      strategyType: 'weekly' | 'monthly' | 'campaign';
       postingFrequency: number;
-      targetAudience?: string;
-      goals?: string;
+      targetAudience: {
+        description: string;
+        industries?: string[];
+        roles?: string[];
+        interests?: string[];
+      };
+      goals: {
+        primary: 'thought_leadership' | 'lead_generation' | 'community_building' | 'brand_awareness';
+        secondary?: string[];
+        kpis?: string[];
+      };
     }) => {
       const { data } = await apiClient.post('/strategy/generate', params);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['strategy'] });
-      queryClient.invalidateQueries({ queryKey: ['strategies'] });
+      // Don't invalidate strategy queries here — the job is async.
+      // The useJobPolling hook will invalidate when the job completes.
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
     },
   });

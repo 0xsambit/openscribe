@@ -4,86 +4,81 @@ import { Button } from "@/components/ui/button";
 export default function HomePage() {
 	return (
 		<div className="flex min-h-screen flex-col">
-			{/* Header */}
-			<header className="border-b">
-				<div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-					<div className="flex items-center gap-2">
-						<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-							OS
-						</div>
-						<span className="text-lg font-bold">OpenScribe</span>
-					</div>
-					<div className="flex items-center gap-3">
-						<Link href="/login">
-							<Button variant="ghost">Sign in</Button>
-						</Link>
+			{/* Nav */}
+			<nav className="flex h-14 items-center justify-between border-b px-6">
+				<span className="text-sm font-semibold tracking-tight">OpenScribe</span>
+				<div className="flex items-center gap-1">
+					<Link href="/docs">
+						<Button variant="ghost" size="sm">
+							Docs
+						</Button>
+					</Link>
+					<Link href="/login">
+						<Button variant="ghost" size="sm">
+							Sign in
+						</Button>
+					</Link>
+					<Link href="/register">
+						<Button size="sm">Get Started</Button>
+					</Link>
+				</div>
+			</nav>
+
+			{/* Hero */}
+			<main className="flex flex-1 flex-col items-center justify-center px-6">
+				<div className="max-w-lg text-center">
+					<p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+						Open-source &middot; Self-hosted
+					</p>
+					<h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+						AI LinkedIn Content Strategist
+					</h1>
+					<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+						Analyze your writing style, generate data-driven strategies, and
+						create posts that sound like you.
+					</p>
+					<div className="mt-8 flex items-center justify-center gap-3">
 						<Link href="/register">
-							<Button>Get Started</Button>
+							<Button>Start Free</Button>
+						</Link>
+						<Link href="/docs">
+							<Button variant="outline">Documentation</Button>
 						</Link>
 					</div>
 				</div>
-			</header>
 
-			{/* Hero */}
-			<main className="flex flex-1 items-center justify-center px-4">
-				<div className="mx-auto max-w-3xl text-center">
-					<h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-						Your AI-Powered
-						<br />
-						<span className="text-primary">LinkedIn Content Strategist</span>
-					</h1>
-					<p className="mt-6 text-lg text-muted-foreground">
-						Import your LinkedIn posts, analyze your writing style, generate
-						data-driven strategies, and create engaging content that sounds
-						authentically you. Open-source and self-hosted.
-					</p>
-					<div className="mt-10 flex items-center justify-center gap-4">
-						<Link href="/register">
-							<Button size="lg">Start for Free</Button>
-						</Link>
-						<a
-							href="https://github.com/openscribe"
-							target="_blank"
-							rel="noopener noreferrer">
-							<Button variant="outline" size="lg">
-								View on GitHub
-							</Button>
-						</a>
+				{/* Feature grid */}
+				<div className="mt-20 grid w-full max-w-2xl gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-3">
+					<div className="bg-card p-6">
+						<p className="text-sm font-medium">Style Analysis</p>
+						<p className="mt-1 text-xs text-muted-foreground">
+							AI learns your tone, vocabulary, and engagement patterns.
+						</p>
 					</div>
+					<div className="bg-card p-6">
+						<p className="text-sm font-medium">Smart Strategy</p>
+						<p className="mt-1 text-xs text-muted-foreground">
+							Personalized content calendars built from your data.
+						</p>
+					</div>
+					<div className="bg-card p-6">
+						<p className="text-sm font-medium">Content Generation</p>
+						<p className="mt-1 text-xs text-muted-foreground">
+							Posts in your voice with iterative refinement.
+						</p>
+					</div>
+				</div>
 
-					{/* Features */}
-					<div className="mt-20 grid gap-8 sm:grid-cols-3 text-left">
-						<div className="rounded-lg border p-6">
-							<div className="mb-3 text-2xl">📊</div>
-							<h3 className="font-semibold">Style Analysis</h3>
-							<p className="mt-2 text-sm text-muted-foreground">
-								AI analyzes your writing patterns, tone, vocabulary, and
-								what drives engagement.
-							</p>
-						</div>
-						<div className="rounded-lg border p-6">
-							<div className="mb-3 text-2xl">🎯</div>
-							<h3 className="font-semibold">Smart Strategies</h3>
-							<p className="mt-2 text-sm text-muted-foreground">
-								Get personalized content calendars and posting strategies
-								based on your data.
-							</p>
-						</div>
-						<div className="rounded-lg border p-6">
-							<div className="mb-3 text-2xl">✍️</div>
-							<h3 className="font-semibold">Content Generation</h3>
-							<p className="mt-2 text-sm text-muted-foreground">
-								Generate posts in your unique voice with iterative feedback
-								refinement.
-							</p>
-						</div>
-					</div>
+				{/* Command */}
+				<div className="mt-10 mb-12 rounded-md border bg-card px-4 py-2 font-mono text-xs text-muted-foreground">
+					<span className="mr-2 text-foreground">$</span>
+					docker compose up -d
 				</div>
 			</main>
 
 			{/* Footer */}
-			<footer className="border-t py-6 text-center text-sm text-muted-foreground">
-				<p>OpenScribe is open-source software licensed under MIT.</p>
+			<footer className="border-t py-4 text-center text-xs text-muted-foreground">
+				MIT License
 			</footer>
 		</div>
 	);

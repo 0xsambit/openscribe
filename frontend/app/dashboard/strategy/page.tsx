@@ -2,222 +2,254 @@
 
 import { useState } from "react";
 import { useCurrentStrategy, useGenerateStrategy } from "@/hooks/use-strategy";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useJobPolling } from "@/hooks/use-job-polling";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Alert } from "@/components/ui/alert";
-import { Spinner } from "@/components/ui/spinner";
+import { ThinkingCard } from "@/components/ui/thinking-card";
+import { SkeletonList } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Target, Calendar, Sparkles } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 const strategyTypes = [
-	{ value: "growth", label: "Growth (Maximize reach & followers)" },
-	{ value: "engagement", label: "Engagement (Maximize interactions)" },
-	{ value: "thought_leadership", label: "Thought Leadership (Build authority)" },
-	{ value: "balanced", label: "Balanced (Mix of all goals)" },
+	{ value: "weekly", label: "Weekly (7 days)" },
+	{ value: "monthly", label: "Monthly (30 days)" },
+	{ value: "campaign", label: "Campaign (Goal-driven)" },
+];
+
+const goalTypes = [
+	{ value: "thought_leadership", label: "Thought Leadership" },
+	{ value: "lead_generation", label: "Lead Generation" },
+	{ value: "community_building", label: "Community Building" },
+	{ value: "brand_awareness", label: "Brand Awareness" },
 ];
 
 export default function StrategyPage() {
 	const { data: strategyData, isLoading: strategyLoading } = useCurrentStrategy();
 	const generateMutation = useGenerateStrategy();
 
-	const [strategyType, setStrategyType] = useState("balanced");
+	const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
+	const [jobId, setJobId] = useState<string | null>(null);
+
+	const job = useJobPolling(jobId, {
+		invalidateKeys: [["strategy", "current"], ["strategy"], ["strategies"]],
+		onComplete: () => setActiveTab("current"),
+	});
+
+	const [strategyType, setStrategyType] = useState<"weekly" | "monthly" | "campaign">("weekly");
 	const [postingFrequency, setPostingFrequency] = useState("3");
-	const [targetAudience, setTargetAudience] = useState("");
-	const [goals, setGoals] = useState("");
+	const [audienceDescription, setAudienceDescription] = useState("");
+	const [audienceIndustries, setAudienceIndustries] = useState("");
+	const [audienceRoles, setAudienceRoles] = useState("");
+	const [primaryGoal, setPrimaryGoal] = useState<
+		"thought_leadership" | "lead_generation" | "community_building" | "brand_awareness"
+	>("thought_leadership");
+	const [kpis, setKpis] = useState("");
 
 	const strategy = strategyData?.data;
 
-	const handleGenerate = () => {
-		generateMutation.mutate({
-			strategyType,
-			postingFrequency: parseInt(postingFrequency),
-			targetAudience: targetAudience || undefined,
-			goals: goals || undefined,
-		});
+	const handleGenerate = async () => {
+		try {
+			const result = await generateMutation.mutateAsync({
+				strategyType,
+				postingFrequency: parseInt(postingFrequency),
+				targetAudience: {
+					description: audienceDescription,
+					industries: audienceIndustries
+						? audienceIndustries
+								.split(",")
+								.map((s) => s.trim())
+								.filter(Boolean)
+						: [],
+					roles: audienceRoles
+						? audienceRoles
+								.split(",")
+								.map((s) => s.trim())
+								.filter(Boolean)
+						: [],
+					interests: [],
+				},
+				goals: {
+					primary: primaryGoal,
+					secondary: [],
+					kpis: kpis
+						? kpis
+								.split(",")
+								.map((s) => s.trim())
+								.filter(Boolean)
+						: [],
+				},
+			});
+			const id = result?.data?.jobId;
+			if (id) setJobId(id);
+		} catch {
+			// mutation error handled by generateMutation.isError
+		}
 	};
 
 	return (
-		<div className="space-y-6">
+		<div className="mx-auto max-w-2xl space-y-6">
 			<div>
-				<h1 className="text-3xl font-bold">Content Strategy</h1>
-				<p className="text-muted-foreground">
-					Generate AI-powered content strategies based on your LinkedIn data.
+				<h1 className="text-lg font-semibold">Strategy</h1>
+				<p className="text-sm text-muted-foreground">
+					AI-powered content strategies from your LinkedIn data.
 				</p>
 			</div>
 
-			<Tabs defaultValue={strategy ? "current" : "generate"}>
+			<Tabs
+				value={activeTab}
+				defaultValue={strategy ? "current" : "generate"}
+				onValueChange={setActiveTab}>
 				<TabsList>
-					<TabsTrigger value="current">Current Strategy</TabsTrigger>
-					<TabsTrigger value="generate">Generate New</TabsTrigger>
+					<TabsTrigger value="current">Current</TabsTrigger>
+					<TabsTrigger value="generate">Generate</TabsTrigger>
 				</TabsList>
 
-				{/* Current Strategy */}
 				<TabsContent value="current">
 					{strategyLoading ? (
-						<div className="flex justify-center py-12">
-							<Spinner />
-						</div>
+						<SkeletonList count={2} />
 					) : !strategy ? (
-						<Card>
-							<CardContent className="py-12 text-center">
-								<Target className="mx-auto h-12 w-12 text-muted-foreground" />
-								<h3 className="mt-4 text-lg font-semibold">
-									No Active Strategy
-								</h3>
-								<p className="mt-2 text-sm text-muted-foreground">
-									Generate a new content strategy to get personalized
-									recommendations.
-								</p>
-							</CardContent>
-						</Card>
+						<div className="rounded-lg border py-16 text-center">
+							<p className="text-sm text-muted-foreground">
+								No active strategy. Generate one to get started.
+							</p>
+						</div>
 					) : (
 						<div className="space-y-4">
-							<Card>
-								<CardHeader>
-									<div className="flex items-center justify-between">
-										<div>
-											<CardTitle>Active Strategy</CardTitle>
-											<CardDescription>
-												Type:{" "}
-												<Badge variant="secondary">
-													{strategy.strategyType}
-												</Badge>
-												{" · "}Created:{" "}
-												{formatDate(strategy.createdAt)}
-												{strategy.expiresAt &&
-													` · Expires: ${formatDate(strategy.expiresAt)}`}
-											</CardDescription>
-										</div>
+							{/* Meta */}
+							<div className="flex items-center gap-2 text-xs text-muted-foreground">
+								<Badge variant="secondary">{strategy.strategyType}</Badge>
+								<span>&middot;</span>
+								<span>{formatDate(strategy.createdAt)}</span>
+								{strategy.expiresAt && (
+									<>
+										<span>&middot;</span>
+										<span>
+											Expires {formatDate(strategy.expiresAt)}
+										</span>
+									</>
+								)}
+							</div>
+
+							{/* Themes */}
+							{strategy.themes && (
+								<div>
+									<p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+										Themes
+									</p>
+									<div className="grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2">
+										{(
+											strategy.themes as Array<{
+												name: string;
+												description: string;
+												frequency: string;
+											}>
+										).map(
+											(
+												theme: {
+													name: string;
+													description: string;
+													frequency: string;
+												},
+												i: number,
+											) => (
+												<div key={i} className="bg-card p-4">
+													<p className="text-sm font-medium">
+														{theme.name}
+													</p>
+													<p className="mt-1 text-xs text-muted-foreground">
+														{theme.description}
+													</p>
+													{theme.frequency && (
+														<Badge
+															variant="outline"
+															className="mt-2 text-[10px]">
+															{theme.frequency}
+														</Badge>
+													)}
+												</div>
+											),
+										)}
 									</div>
-								</CardHeader>
-								<CardContent>
-									{/* Themes */}
-									{strategy.themes && (
-										<div className="mb-6">
-											<h4 className="mb-3 font-semibold">
-												Content Themes
-											</h4>
-											<div className="grid gap-3 sm:grid-cols-2">
-												{(
-													strategy.themes as Array<{
-														name: string;
-														description: string;
-														frequency: string;
-													}>
-												).map(
-													(
-														theme: {
-															name: string;
-															description: string;
-															frequency: string;
-														},
-														i: number,
-													) => (
-														<Card key={i}>
-															<CardContent className="p-4">
-																<h5 className="font-medium">
-																	{theme.name}
-																</h5>
-																<p className="mt-1 text-sm text-muted-foreground">
-																	{
-																		theme.description
-																	}
-																</p>
-																{theme.frequency && (
-																	<Badge
-																		variant="outline"
-																		className="mt-2">
-																		{
-																			theme.frequency
-																		}
-																	</Badge>
-																)}
-															</CardContent>
-														</Card>
-													),
-												)}
-											</div>
-										</div>
-									)}
+								</div>
+							)}
 
-									{/* Target Audience */}
-									{strategy.targetAudience && (
-										<div className="mb-6">
-											<h4 className="mb-2 font-semibold">
-												Target Audience
-											</h4>
-											<p className="text-sm text-muted-foreground">
-												{typeof strategy.targetAudience ===
-												"string"
-													? strategy.targetAudience
-													: JSON.stringify(
-															strategy.targetAudience,
-														)}
-											</p>
-										</div>
-									)}
+							{/* Audience */}
+							{strategy.targetAudience && (
+								<div>
+									<p className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+										Target Audience
+									</p>
+									<p className="text-sm text-muted-foreground">
+										{typeof strategy.targetAudience === "object"
+											? (
+													strategy.targetAudience as {
+														description?: string;
+													}
+												).description ||
+												JSON.stringify(strategy.targetAudience)
+											: String(strategy.targetAudience)}
+									</p>
+								</div>
+							)}
 
-									{/* Goals */}
-									{strategy.goals && (
-										<div>
-											<h4 className="mb-2 font-semibold">Goals</h4>
-											<p className="text-sm text-muted-foreground">
-												{typeof strategy.goals === "string"
-													? strategy.goals
-													: JSON.stringify(strategy.goals)}
-											</p>
-										</div>
-									)}
-								</CardContent>
-							</Card>
+							{/* Goals */}
+							{strategy.goals && (
+								<div>
+									<p className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+										Goals
+									</p>
+									<p className="text-sm text-muted-foreground">
+										{typeof strategy.goals === "object"
+											? `Primary: ${(strategy.goals as { primary?: string }).primary || "N/A"}`
+											: String(strategy.goals)}
+									</p>
+								</div>
+							)}
 						</div>
 					)}
 				</TabsContent>
 
-				{/* Generate New */}
 				<TabsContent value="generate">
-					<Card>
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2">
-								<Sparkles className="h-5 w-5" />
-								Generate Strategy
-							</CardTitle>
-							<CardDescription>
-								Configure your strategy parameters. Make sure you&apos;ve
-								imported posts and run style analysis first.
-							</CardDescription>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							{generateMutation.isSuccess && (
-								<Alert variant="success">
-									Strategy generation started! It will appear under
-									&quot;Current Strategy&quot; once complete.
-								</Alert>
-							)}
-							{generateMutation.isError && (
-								<Alert variant="error">
-									Strategy generation failed. Make sure you have posts
-									imported and an AI provider configured.
-								</Alert>
-							)}
+					<div className="space-y-5">
+						{(generateMutation.isSuccess ||
+							job.isThinking ||
+							job.phase === "completed") && (
+							<ThinkingCard
+								phase={job.phase}
+								label="Generating strategy..."
+								progress={job.progress}
+								error={job.error}
+							/>
+						)}
+						{generateMutation.isError && (
+							<Alert variant="error">
+								Failed. Ensure posts are imported and an AI provider is
+								configured.
+							</Alert>
+						)}
 
-							<div className="space-y-2">
-								<Label>Strategy Type</Label>
+						<div className="grid gap-4 sm:grid-cols-2">
+							<div className="space-y-1.5">
+								<Label className="text-xs">Strategy Type</Label>
 								<Select
 									options={strategyTypes}
 									value={strategyType}
-									onChange={(e) => setStrategyType(e.target.value)}
+									onChange={(e) =>
+										setStrategyType(
+											e.target.value as
+												| "weekly"
+												| "monthly"
+												| "campaign",
+										)
+									}
 								/>
 							</div>
-
-							<div className="space-y-2">
-								<Label>Posts Per Week</Label>
+							<div className="space-y-1.5">
+								<Label className="text-xs">Posts Per Week</Label>
 								<Input
 									type="number"
 									min="1"
@@ -226,35 +258,76 @@ export default function StrategyPage() {
 									onChange={(e) => setPostingFrequency(e.target.value)}
 								/>
 							</div>
+						</div>
 
-							<div className="space-y-2">
-								<Label>Target Audience (optional)</Label>
+						<div className="space-y-1.5">
+							<Label className="text-xs">Primary Goal</Label>
+							<Select
+								options={goalTypes}
+								value={primaryGoal}
+								onChange={(e) =>
+									setPrimaryGoal(
+										e.target.value as
+											| "thought_leadership"
+											| "lead_generation"
+											| "community_building"
+											| "brand_awareness",
+									)
+								}
+							/>
+						</div>
+
+						<div className="space-y-1.5">
+							<Label className="text-xs">
+								Target Audience <span className="text-destructive">*</span>
+							</Label>
+							<Input
+								placeholder="e.g., SaaS founders looking to grow their personal brand"
+								value={audienceDescription}
+								onChange={(e) => setAudienceDescription(e.target.value)}
+							/>
+						</div>
+
+						<div className="grid gap-4 sm:grid-cols-2">
+							<div className="space-y-1.5">
+								<Label className="text-xs">
+									Industries (comma-separated)
+								</Label>
 								<Input
-									placeholder="e.g., SaaS founders, tech professionals, marketers"
-									value={targetAudience}
-									onChange={(e) => setTargetAudience(e.target.value)}
+									placeholder="e.g., SaaS, FinTech"
+									value={audienceIndustries}
+									onChange={(e) => setAudienceIndustries(e.target.value)}
 								/>
 							</div>
-
-							<div className="space-y-2">
-								<Label>Goals (optional)</Label>
-								<Textarea
-									placeholder="What do you want to achieve? e.g., Build thought leadership in AI, Grow to 10k followers"
-									value={goals}
-									onChange={(e) => setGoals(e.target.value)}
-									rows={3}
+							<div className="space-y-1.5">
+								<Label className="text-xs">
+									Target Roles (comma-separated)
+								</Label>
+								<Input
+									placeholder="e.g., CTO, VP Engineering"
+									value={audienceRoles}
+									onChange={(e) => setAudienceRoles(e.target.value)}
 								/>
 							</div>
+						</div>
 
-							<Button
-								onClick={handleGenerate}
-								isLoading={generateMutation.isPending}
-								className="w-full">
-								<Calendar className="mr-2 h-4 w-4" />
-								Generate Strategy
-							</Button>
-						</CardContent>
-					</Card>
+						<div className="space-y-1.5">
+							<Label className="text-xs">KPIs (comma-separated)</Label>
+							<Input
+								placeholder="e.g., 500 new followers, 10% engagement rate"
+								value={kpis}
+								onChange={(e) => setKpis(e.target.value)}
+							/>
+						</div>
+
+						<Button
+							onClick={handleGenerate}
+							isLoading={generateMutation.isPending}
+							disabled={!audienceDescription.trim()}
+							className="w-full">
+							Generate Strategy
+						</Button>
+					</div>
 				</TabsContent>
 			</Tabs>
 		</div>

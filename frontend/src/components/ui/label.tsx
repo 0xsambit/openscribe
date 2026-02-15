@@ -5,7 +5,7 @@ function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLabelEleme
 	return (
 		<label
 			className={cn(
-				"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+				"text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 				className,
 			)}
 			{...props}

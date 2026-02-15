@@ -25,6 +25,19 @@ export function loadPrompt(templateName: string, variables: Record<string, strin
 
   // Interpolate variables
   let result = template;
+
+  // Handle conditional blocks: {{#key}}...{{/key}}
+  // If the variable is truthy and non-empty, unwrap the block (remove the tags, keep content).
+  // If the variable is falsy/missing/empty, remove the entire block.
+  result = result.replace(
+    /\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g,
+    (_, key, content) => {
+      const value = variables[key];
+      return value && value.trim() ? content : '';
+    },
+  );
+
+  // Simple variable substitution: {{key}}
   for (const [key, value] of Object.entries(variables)) {
     result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value);
   }

@@ -15,7 +15,7 @@ export function useAddApiKey() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (params: { provider: string; apiKey: string; label?: string }) => {
+    mutationFn: async (params: { provider: string; apiKey: string; modelName: string; label?: string }) => {
       const { data } = await apiClient.post('/api-keys', params);
       return data;
     },

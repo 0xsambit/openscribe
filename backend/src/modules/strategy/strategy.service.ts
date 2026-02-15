@@ -154,7 +154,7 @@ export class StrategyService {
       postingFrequency: strategy.postingFrequency,
       targetAudience: strategy.targetAudience,
       goals: strategy.goals,
-      generatedAt: strategy.generatedAt.toISOString(),
+      createdAt: strategy.generatedAt.toISOString(),
       expiresAt: strategy.expiresAt.toISOString(),
     };
   }
@@ -176,7 +176,7 @@ export class StrategyService {
       postingFrequency: s.postingFrequency,
       targetAudience: s.targetAudience,
       goals: s.goals,
-      generatedAt: s.generatedAt.toISOString(),
+      createdAt: s.generatedAt.toISOString(),
       expiresAt: s.expiresAt.toISOString(),
     }));
   }

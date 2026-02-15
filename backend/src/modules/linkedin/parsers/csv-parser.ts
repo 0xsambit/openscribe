@@ -29,7 +29,7 @@ export function parseLinkedInCSV(csvContent: string): ParsedPost[] {
 
   for (const record of records) {
     const postText = findField(record, [
-      'ShareCommentary', 'Commentary', 'Post', 'post_text', 'PostText',
+      'postText', 'ShareCommentary', 'Commentary', 'Post', 'post_text', 'PostText',
       'text', 'Text', 'content', 'Content', 'body', 'Body',
       'ShareCommentary ', // LinkedIn sometimes has trailing space
     ]);
@@ -37,7 +37,7 @@ export function parseLinkedInCSV(csvContent: string): ParsedPost[] {
     if (!postText || postText.trim().length === 0) continue;
 
     const postedAtStr = findField(record, [
-      'Date', 'date', 'Posted', 'posted_at', 'PostedAt',
+      'postedAt', 'Date', 'date', 'Posted', 'posted_at', 'PostedAt',
       'created_at', 'CreatedAt', 'timestamp', 'Timestamp',
       'ShareDate', 'Created Date',
     ]);
@@ -47,10 +47,10 @@ export function parseLinkedInCSV(csvContent: string): ParsedPost[] {
 
     posts.push({
       postText: postText.trim(),
-      postUrl: findField(record, ['Url', 'url', 'URL', 'post_url', 'PostUrl', 'ShareLink', 'Link']) || undefined,
-      likesCount: parseIntSafe(findField(record, ['Likes', 'likes', 'likes_count', 'LikesCount', 'Reactions', 'reactions'])),
-      commentsCount: parseIntSafe(findField(record, ['Comments', 'comments', 'comments_count', 'CommentsCount'])),
-      sharesCount: parseIntSafe(findField(record, ['Shares', 'shares', 'shares_count', 'SharesCount', 'Reposts', 'reposts'])),
+      postUrl: findField(record, ['Url', 'url', 'URL', 'post_url', 'PostUrl', 'postUrl', 'ShareLink', 'Link']) || undefined,
+      likesCount: parseIntSafe(findField(record, ['likesCount', 'Likes', 'likes', 'likes_count', 'LikesCount', 'Reactions', 'reactions'])),
+      commentsCount: parseIntSafe(findField(record, ['commentsCount', 'Comments', 'comments', 'comments_count', 'CommentsCount'])),
+      sharesCount: parseIntSafe(findField(record, ['sharesCount', 'Shares', 'shares', 'shares_count', 'SharesCount', 'Reposts', 'reposts'])),
       postedAt,
     });
   }
@@ -59,9 +59,17 @@ export function parseLinkedInCSV(csvContent: string): ParsedPost[] {
 }
 
 function findField(record: Record<string, string>, possibleNames: string[]): string | null {
+  // First try exact match
   for (const name of possibleNames) {
     if (record[name] !== undefined && record[name] !== null && record[name] !== '') {
       return record[name];
+    }
+  }
+  // Fallback: case-insensitive match
+  const lowerNames = possibleNames.map((n) => n.trim().toLowerCase());
+  for (const key of Object.keys(record)) {
+    if (lowerNames.includes(key.trim().toLowerCase()) && record[key] !== '') {
+      return record[key];
     }
   }
   return null;
