@@ -32,15 +32,15 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (email, password) => {
     const { data } = await apiClient.post('/auth/login', { email, password });
-    const { user, accessToken, refreshToken } = data.data;
-    setTokens(accessToken, refreshToken);
+    const { user, tokens } = data.data;
+    setTokens(tokens.accessToken, tokens.refreshToken);
     set({ user, isAuthenticated: true, isLoading: false });
   },
 
   register: async (email, password, name) => {
     const { data } = await apiClient.post('/auth/register', { email, password, name });
-    const { user, accessToken, refreshToken } = data.data;
-    setTokens(accessToken, refreshToken);
+    const { user, tokens } = data.data;
+    setTokens(tokens.accessToken, tokens.refreshToken);
     set({ user, isAuthenticated: true, isLoading: false });
   },
 
