@@ -26,12 +26,12 @@ export default function HomePage() {
 
 			{/* Hero */}
 			<main className="flex flex-1 flex-col items-center justify-center px-6">
-				<div className="max-w-lg text-center">
+				<div className="max-w-3xl text-center">
 					<p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
 						Open-source &middot; Self-hosted
 					</p>
 					<h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-						AI LinkedIn Content Strategist
+						Openscribe - AI LinkedIn Content Strategist
 					</h1>
 					<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
 						Analyze your writing style, generate data-driven strategies, and
