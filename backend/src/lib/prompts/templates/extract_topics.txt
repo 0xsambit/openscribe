@@ -1,0 +1,32 @@
+You are an expert content strategist analyzing LinkedIn posts. Extract the main topics and themes from the following collection of posts.
+
+## Posts to Analyze:
+{{posts}}
+
+## Instructions:
+1. Identify all distinct topics/themes across these posts
+2. For each topic, list representative keywords
+3. Estimate the number of posts per topic
+4. Note which topics seem to drive the most engagement (based on like/comment/share counts if available)
+5. Classify each topic's trend: rising (more recent posts), stable, or declining
+
+## Output Format (JSON only, no other text):
+{
+  "topics": [
+    {
+      "label": "<Human-readable topic name>",
+      "keywords": ["<keyword1>", "<keyword2>", ...],
+      "postCount": <number>,
+      "avgEngagement": <estimated average engagement score>,
+      "trend": "<rising|stable|declining>",
+      "samplePostSnippets": ["<first 50 chars of representative post>", ...]
+    }
+  ],
+  "contentGaps": ["<topic the author should explore but hasn't>", ...],
+  "topPerformingThemes": ["<theme1>", "<theme2>", ...],
+  "recommendedMix": {
+    "primary": ["<top 3 topics to focus on>"],
+    "secondary": ["<2-3 supporting topics>"],
+    "experimental": ["<1-2 new topics to try>"]
+  }
+}

@@ -1,0 +1,35 @@
+You are an expert writing analyst specializing in LinkedIn content. Analyze the following collection of LinkedIn posts written by the same author and extract a detailed writing style profile.
+
+## Posts to Analyze:
+{{posts}}
+
+## Instructions:
+Analyze these posts and provide a comprehensive style profile as a JSON object. Consider:
+
+1. **Tone**: What percentage of posts are professional, casual, motivational, or storytelling?
+2. **Sentence Structure**: Average sentence length, complexity, variation
+3. **Vocabulary**: Level of sophistication, industry jargon usage, unique phrases
+4. **Structural Patterns**: How do they start posts (hooks)? How do they end (CTAs)? Do they use lists, questions, emojis?
+5. **Content Patterns**: What makes their high-performing posts different from low-performing ones?
+6. **Voice Characteristics**: What makes this author's writing unique and recognizable?
+
+## Output Format (JSON only, no other text):
+{
+  "toneDistribution": {
+    "professional": <0-100>,
+    "casual": <0-100>,
+    "motivational": <0-100>,
+    "storytelling": <0-100>
+  },
+  "hookPatterns": ["<pattern1>", "<pattern2>", ...],
+  "ctaPatterns": ["<pattern1>", "<pattern2>", ...],
+  "uniquePhrases": ["<phrase1>", "<phrase2>", ...],
+  "voiceCharacteristics": ["<trait1>", "<trait2>", ...],
+  "contentInsights": {
+    "preferredLength": "<short/medium/long>",
+    "emojiUsage": "<none/minimal/moderate/heavy>",
+    "formattingStyle": "<paragraphs/lists/mixed>",
+    "questionFrequency": "<rare/occasional/frequent>"
+  },
+  "summary": "<A 2-3 sentence summary of this author's distinctive writing style>"
+}
